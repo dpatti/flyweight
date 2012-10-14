@@ -1,29 +1,34 @@
+$window = $(window)
 $stage = $('#stage')
 socket = io.connect('/')
+
+CELL_SIZE = 20
 
 id = null
 cell_grid = {}
 down = false
 self_color = null
+
+# Generate grid
+for i in [0...$window.height()/CELL_SIZE]
+  tr = $('<tr>').appendTo $stage
+  cell_grid[i] = {}
+  for j in [0...$window.width()/CELL_SIZE]
+    do (i, j) ->
+      td = $('<td>').appendTo tr
+      cell_grid[i][j] = td
+      # Set click handler
+      td.mouseover         -> draw(i, j, down == 1) if down
+      td.mousedown     (e) -> draw(i, j, e.button == 2)
+
 socket.on 'connect', ->
   console.log "Connected"
   socket.on 'state', (state) ->
-    { id, size, grid, color: self_color } = state
-
-    # Generate grid
-    for i in [0...size]
-      tr = $('<tr>').appendTo $stage
-      cell_grid[i] = {}
-      for j in [0...size]
-        do (i, j) ->
-          td = $('<td>').appendTo tr
-          cell_grid[i][j] = td
-          # Set initial color by state
-          if grid[i]?[j]
-            td.set_color grid[i][j]
-          # Set click handler
-          td.mouseover         -> draw(i, j, down == 1) if down
-          td.mousedown     (e) -> draw(i, j, e.button == 2)
+    { id, grid, color: self_color } = state
+    for i of grid
+      for j, c of grid[i]
+        # Set initial color by state
+        cell_grid[i]?[j]?.set_color c
 
   socket.on 'update', (pixels) ->
     for {x, y, color} in pixels

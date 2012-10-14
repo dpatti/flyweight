@@ -3,8 +3,6 @@ io           = require 'socket.io'
 express      = require 'express'
 ColorFactory = require './factory.coffee'
 
-GRID_SIZE = 50
-
 class Server
   constructor: (port) ->
     # Initialize server and clients
@@ -46,7 +44,6 @@ class Server
       color_grid[i] = {}
       for j, c of @grid[i]
         color_grid[i][j] = c.to_rgb()
-    size: GRID_SIZE
     grid: color_grid
 
   # Called on connect
@@ -60,9 +57,11 @@ class Server
   # Gets called via socket
   set_color: (id, {x, y}) =>
     # Only respond to valid coordinates
-    if x > 0 and x < GRID_SIZE and y > 0 and y < GRID_SIZE
+    if x > 0 and  y > 0
       color = @clients[id]?.color ? @factory.blank
       @grid[x] ?= {}
+      # Skip if we're not changing it
+      return if @grid[x][y] == color
       @grid[x][y] = color
       # Add to the queue and schedule an update
       @queue.push {x, y, color: color.to_rgb()}
