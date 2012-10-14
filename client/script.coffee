@@ -33,7 +33,7 @@ socket.on 'connect', ->
 
   socket.on 'update', (pixels) ->
     for {x, y, color} in pixels
-      cell_grid[x][y].set_color color
+      cell_grid[x]?[y]?.set_color color
 
   socket.on 'clear', ->
     $('td').set_color()

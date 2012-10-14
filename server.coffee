@@ -19,6 +19,11 @@ class Server
 
     # Set up sockets
     io = io.listen(server)
+    io.configure ->
+      # Heroku doesn't support WebSockets :(
+      io.set 'transports', ['xhr-polling']
+      io.set 'polling duration', 10
+    # Wait for connection
     io.sockets.on 'connection', (socket) =>
       id = @add_client(socket)
       socket.emit 'state', _.extend @fetch_state(), { id, color: @clients[id].color.to_rgb() }
