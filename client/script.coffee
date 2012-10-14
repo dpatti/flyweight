@@ -30,13 +30,34 @@ socket.on 'connect', ->
     for {x, y, color} in pixels
       cell_grid[x][y].set_color color
 
+  socket.on 'clear', ->
+    $('td').set_color()
+
   $stage.mousedown -> down = true
   $stage.mouseup ->   down = false
+
+  $('#clear').click ->
+    socket.emit 'clear'
+    $(this).attr('disabled', 'disabled')
+    ready = Date.now() + 1000 * 10
+    timer = setInterval =>
+      now = Date.now()
+      if now > ready
+        $(this).removeAttr('disabled')
+        $(this).text('Clear board')
+        clearInterval(timer)
+      else
+        $(this).text("Clear board (#{ Math.ceil((ready - now)/1000) }s)")
+    , 1000
+
 
 draw = (x, y) ->
   socket.emit 'set_color', id, {x, y}
   # Automatic response
   cell_grid[x][y].set_color self_color
 
-$.fn.set_color = ([r, g, b]) ->
-  $(this).css 'background-color', "rgb(#{[r, g, b].join ','})"
+$.fn.set_color = (color) ->
+  if color
+    [r, g, b] = color
+    val = "rgb(#{[r, g, b].join ','})"
+  $(this).css 'background-color', val ? ''

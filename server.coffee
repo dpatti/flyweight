@@ -25,6 +25,9 @@ class Server
       id = @add_client(socket)
       socket.emit 'state', _.extend @fetch_state(), { id, color: @clients[id].color.to_rgb() }
       socket.on 'set_color', @set_color
+      socket.on 'clear', ->
+        @grid = {}
+        io.sockets.emit 'clear'
       socket.on 'disconnect', ->
 
     # Make sure we don't update too frequently
