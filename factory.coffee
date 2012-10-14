@@ -5,6 +5,8 @@ class ColorFactory
   constructor: ->
     @cache = []
 
+  blank: new Color(0, 0, 100)
+
   get: (color) ->
     if color in @cache
       return color

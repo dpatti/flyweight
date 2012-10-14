@@ -22,9 +22,9 @@ socket.on 'connect', ->
           if grid[i]?[j]
             td.set_color grid[i][j]
           # Set click handler
-          td.mouseover -> draw(i, j) if down
-          td.click ->     draw(i, j)
-
+          td.mouseover         -> draw(i, j, down == 1) if down
+          td.click             -> draw(i, j)
+          td.on 'contextmenu', -> draw(i, j, true)
 
   socket.on 'update', (pixels) ->
     for {x, y, color} in pixels
@@ -33,8 +33,10 @@ socket.on 'connect', ->
   socket.on 'clear', ->
     $('td').set_color()
 
-  $stage.mousedown -> down = true
-  $stage.mouseup ->   down = false
+  $stage.mousedown (e) -> down = (e.button ? 0) - 1
+  $stage.mouseup       -> down = 0
+  # No right clicks on the stage, this will bubble up from td
+  $stage.on 'contextmenu', (e) -> e.preventDefault()
 
   $('#clear').click ->
     socket.emit 'clear'
@@ -51,10 +53,14 @@ socket.on 'connect', ->
     , 1000
 
 
-draw = (x, y) ->
-  socket.emit 'set_color', id, {x, y}
-  # Automatic response
-  cell_grid[x][y].set_color self_color
+draw = (x, y, clear) ->
+  if clear
+    socket.emit 'set_color', -1, {x, y}
+    cell_grid[x][y].set_color()
+  else
+    socket.emit 'set_color', id, {x, y}
+    # Automatic response
+    cell_grid[x][y].set_color self_color
 
 $.fn.set_color = (color) ->
   if color

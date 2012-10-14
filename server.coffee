@@ -62,7 +62,7 @@ class Server
   set_color: (id, {x, y}) =>
     # Only respond to valid coordinates
     if x > 0 and x < GRID_SIZE and y > 0 and y < GRID_SIZE
-      color = @clients[id].color
+      color = @clients[id]?.color ? @factory.blank
       @grid[x] ?= {}
       @grid[x][y] = color
       # Add to the queue and schedule an update
