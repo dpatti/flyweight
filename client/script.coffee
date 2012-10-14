@@ -23,8 +23,7 @@ socket.on 'connect', ->
             td.set_color grid[i][j]
           # Set click handler
           td.mouseover         -> draw(i, j, down == 1) if down
-          td.click             -> draw(i, j)
-          td.on 'contextmenu', -> draw(i, j, true)
+          td.mousedown     (e) -> draw(i, j, e.button == 2)
 
   socket.on 'update', (pixels) ->
     for {x, y, color} in pixels
