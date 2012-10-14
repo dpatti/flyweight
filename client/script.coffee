@@ -22,6 +22,7 @@ for i in [0...$window.height()/CELL_SIZE]
       td.mousedown     (e) -> draw(i, j, e.button == 2)
 
 socket.on 'connect', ->
+  $stage.removeClass 'disconnected'
   console.log "Connected"
   socket.on 'state', (state) ->
     { id, grid, color: self_color } = state
@@ -36,6 +37,9 @@ socket.on 'connect', ->
 
   socket.on 'clear', ->
     $('td').set_color()
+
+  socket.on 'disconnect', ->
+    $stage.addClass 'disconnected'
 
   $stage.mousedown (e) -> down = (e.button ? 0) - 1
   $stage.mouseup       -> down = 0
@@ -58,6 +62,7 @@ socket.on 'connect', ->
 
 
 draw = (x, y, clear) ->
+  return if $stage.is '.disconnected'
   if clear
     socket.emit 'set_color', -1, {x, y}
     cell_grid[x][y].set_color()
