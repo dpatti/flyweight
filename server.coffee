@@ -45,7 +45,6 @@ class Server
     for i of @grid
       color_grid[i] = {}
       for j, c of @grid[i]
-        debugger
         color_grid[i][j] = c.to_rgb()
     size: GRID_SIZE
     grid: color_grid
