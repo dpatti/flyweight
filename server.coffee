@@ -62,15 +62,15 @@ class Server
   # Gets called via socket
   set_color: (id, {x, y}) =>
     # Only respond to valid coordinates
-    if x > 0 and  y > 0
-      color = @clients[id]?.color ? @factory.blank
-      @grid[x] ?= {}
-      # Skip if we're not changing it
-      return if @grid[x][y] == color
-      @grid[x][y] = color
-      # Add to the queue and schedule an update
-      @queue.push {x, y, color: color.to_rgb()}
-      @update()
+    return if x < 0 or y < 0
+    color = @clients[id]?.color ? @factory.blank
+    @grid[x] ?= {}
+    # Skip if we're not changing it
+    return if @grid[x][y] == color
+    @grid[x][y] = color
+    # Add to the queue and schedule an update
+    @queue.push {x, y, color: color.to_rgb()}
+    @update()
 
   update: ->
     # Send queued updates to each client
